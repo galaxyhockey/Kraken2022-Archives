@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kraken2022 Archives · GXY Arcade</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0f12;--panel:#10191e;--line:#21414a;--ink:#d9f5ec;--dim:#7fa39a;--glow:#2dd4bf;--amber:#fbbf24}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(800px 400px at 50% -100px,#0f3b3a,transparent),repeating-linear-gradient(0deg,#ffffff05 0 1px,transparent 1px 3px),var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;min-height:100vh}
+a{color:inherit}
+header{max-width:1000px;margin:auto;padding:22px 16px 6px}
+.back{color:var(--dim);text-decoration:none;font-size:.9rem}
+h1{font:400 3rem 'VT323',monospace;margin:.3rem 0 0;color:var(--glow);text-shadow:0 0 12px #2dd4bf88;letter-spacing:.04em}
+.sub{color:var(--dim);margin:.2rem 0 1rem;font-size:.92rem;line-height:1.5}
+.notice{border:1px dashed #3d6b63;border-radius:12px;padding:10px 12px;font-size:.82rem;color:var(--dim);background:#0d1a1c;margin-bottom:16px}
+main{max-width:1000px;margin:auto;padding:0 16px 40px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.tape{all:unset;cursor:pointer;display:flex;flex-direction:column;background:linear-gradient(180deg,#132328,#0c1518);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:transform .15s,box-shadow .15s}
+.tape:hover,.tape:focus-visible{transform:translateY(-4px);box-shadow:0 0 0 2px var(--glow),0 14px 24px #000a}
+.label{height:110px;display:grid;place-items:center;font-size:3rem;background:repeating-linear-gradient(90deg,#0f2a2d 0 10px,#0c2326 10px 20px);border-bottom:1px solid var(--line);position:relative}
+.label .no{position:absolute;top:8px;left:10px;font:400 1.1rem 'VT323';color:var(--amber)}
+.info{padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.info b{font-size:.98rem}
+.info small{color:var(--dim);font-size:.75rem}
+.tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.tags span{font-size:.66rem;border:1px solid var(--line);border-radius:999px;padding:2px 7px;color:var(--dim)}
+/* player */
+#player{position:fixed;inset:0;background:#000;display:none;flex-direction:column;z-index:10}
+#player.on{display:flex}
+#bar{display:flex;align-items:center;gap:10px;padding:8px 12px;background:#0c1518;border-bottom:1px solid var(--line);font-size:.88rem}
+#bar button{background:#132328;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:6px 10px;cursor:pointer;font:inherit}
+#bar b{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#frame{flex:1;border:0;width:100%;background:#000}
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="https://galaxyhockey.github.io/GXY-Arcade/">← GXY Arcade</a>
+  <h1>&gt; KRAKEN2022_ARCHIVES</h1>
+  <p class="sub">The original Scratch-era games, preserved exactly as they were made. Nothing has been remastered or updated.</p>
+  <div class="notice">📼 <b>Archive notes:</b> these are the original Scratch projects running in the TurboWarp player. Most were built for a keyboard and mouse, so some may not work well on touch screens. Titles, glitches and quirks are kept as they were.</div>
+</header>
+<main><div class="grid" id="grid"></div></main>
+<div id="player"><div id="bar"><button onclick="closeGame()">← Archives</button><b id="ptitle"></b><button onclick="document.getElementById('frame').requestFullscreen&&document.getElementById('frame').requestFullscreen()">⛶ Fullscreen</button></div><iframe id="frame" title="Archived game" allow="fullscreen; autoplay"></iframe></div>
+<script src="games.js"></script>
+<script>
+const G = window.KRAKEN_GAMES || [], $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+$('grid').innerHTML = G.map((g, i) => `<button class="tape" onclick="openGame('${g.id}')" aria-label="Play ${esc(g.title)}">
+  <div class="label"><span class="no">#${String(i + 1).padStart(2, '0')}</span>${g.icon}</div>
+  <div class="info"><b>${esc(g.title)}</b><small>${g.mb} MB${g.mb > 40 ? " · large, may take a while to load" : ""}</small>
+  <div class="tags">${g.tags.map(t => `<span>${esc(t)}</span>`).join('')}</div></div></button>`).join('');
+function openGame(id){
+  const g = G.find(x => x.id === id); if(!g) return;
+  $('ptitle').textContent = g.title; $('frame').src = 'games/' + g.file; $('player').classList.add('on');
+  history.replaceState(null, '', '#' + id); $('frame').focus();
+  if(window.GXY) GXY.event('arcade', 'archive');
+}
+function closeGame(){ $('frame').src = 'about:blank'; $('player').classList.remove('on'); history.replaceState(null, '', location.pathname); }
+addEventListener('keydown', e => { if(e.key === 'Escape' && $('player').classList.contains('on')) closeGame(); });
+if(location.hash) openGame(location.hash.slice(1));
+</script>
+<script src="https://galaxyhockey.github.io/GXY-Arcade/assets/gxy.js"></script>
+</body>
+</html>
